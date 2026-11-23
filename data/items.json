@@ -1,7 +1,7 @@
 {
   "title": "名古屋日本代購清單",
   "rate": 0.21,
-  "updatedAt": "2026-11-23T13:31:41.415Z",
+  "updatedAt": "2026-11-23T13:34:19.945Z",
   "items": [
     {
       "name": "Nike Mind 001(黑色)  US8",
@@ -10,8 +10,15 @@
       "qty": 1,
       "store": "Nike Nagoya Sakae",
       "note": "US8或US7.5\n26cm",
-      "img": "",
+      "img": "data/img/mwtb1bl1qgwt-mwtb4mi6.jpg",
       "id": "mwtb1bl1qgwt"
     }
-  ]
+  ],
+  "stores": {
+    "Nike Nagoya Sakae": {
+      "map": "https://www.google.com/maps/place/3-ch%C5%8Dme-15-27+Sakae,+Naka+Ward,+Nagoya,+Aichi+460-0008%E6%97%A5%E6%9C%AC/@35.1670029,136.8935199,18z/data=!4m6!3m5!1s0x600370d21d046cfd:0x69cdbf1e6de4bcd5!8m2!3d35.1659107!4d136.9075749!16s%2Fg%2F11g6z2_6zv?entry=ttu&g_ep=EgoyMDI2MTExOC4xIKXMDSoASAFQAw%3D%3D",
+      "hours": "Sun - Sat: 11:00 AM - 9:00 PM",
+      "address": "Chuo-Ku  3-15-27, Sakae  Nagoya-Shi, Aichi, 460-0008, JP  +8152 211 7992"
+    }
+  }
 }
