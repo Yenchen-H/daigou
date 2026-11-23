@@ -1,18 +1,8 @@
 {
   "title": "名古屋日本代購清單",
   "rate": 0.21,
-  "updatedAt": "2026-11-23T09:18:00.117Z",
+  "updatedAt": "2026-11-23T13:22:50.361Z",
   "items": [
-    {
-      "id": "s0",
-      "name": "合利他命 EX Plus 270錠",
-      "jpy": 4780,
-      "twd": "",
-      "qty": 2,
-      "store": "松本清",
-      "note": "要「EX Plus」金色盒，不是一般 EX",
-      "img": "data/img/s0.svg"
-    },
     {
       "id": "s1",
       "name": "Calbee 薯條三兄弟",
