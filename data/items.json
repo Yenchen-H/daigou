@@ -1,18 +1,8 @@
 {
   "title": "名古屋日本代購清單",
   "rate": 0.21,
-  "updatedAt": "2026-11-23T13:22:57.396Z",
+  "updatedAt": "2026-11-23T13:22:58.750Z",
   "items": [
-    {
-      "id": "s5",
-      "name": "Sanrio 酷洛米玩偶吊飾",
-      "jpy": 1650,
-      "twd": "",
-      "qty": 1,
-      "store": "Sanrio Gift Gate",
-      "note": "大約手掌大小，選表情最可愛的",
-      "img": "data/img/s5.svg"
-    },
     {
       "id": "s6",
       "name": "無印良品 舒適手帳 A6",
