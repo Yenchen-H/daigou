@@ -1,0 +1,87 @@
+{
+  "title": "妹妹的日本代購清單",
+  "rate": 0.21,
+  "updatedAt": "2026-11-23T09:00:00.000Z",
+  "items": [
+    {
+      "id": "s0",
+      "name": "合利他命 EX Plus 270錠",
+      "jpy": 4780,
+      "twd": "",
+      "qty": 2,
+      "store": "松本清",
+      "note": "要「EX Plus」金色盒，不是一般 EX",
+      "img": "data/img/s0.svg"
+    },
+    {
+      "id": "s1",
+      "name": "Calbee 薯條三兄弟",
+      "jpy": 1080,
+      "twd": "",
+      "qty": 3,
+      "store": "新千歲機場",
+      "note": "北海道限定，機場最好買；沒有就不用",
+      "img": "data/img/s1.svg"
+    },
+    {
+      "id": "s2",
+      "name": "白色戀人 24入",
+      "jpy": 2484,
+      "twd": "",
+      "qty": 2,
+      "store": "新千歲機場",
+      "note": "",
+      "img": "data/img/s2.svg"
+    },
+    {
+      "id": "s3",
+      "name": "UNIQLO HEATTECH 極暖發熱衣",
+      "jpy": 1990,
+      "twd": "",
+      "qty": 1,
+      "store": "UNIQLO",
+      "note": "女生 M 號、黑色。台灣賣 NT$790",
+      "img": "data/img/s3.svg"
+    },
+    {
+      "id": "s4",
+      "name": "DHC 護唇膏",
+      "jpy": 770,
+      "twd": "",
+      "qty": 4,
+      "store": "唐吉訶德",
+      "note": "",
+      "img": "data/img/s4.svg"
+    },
+    {
+      "id": "s5",
+      "name": "Sanrio 酷洛米玩偶吊飾",
+      "jpy": 1650,
+      "twd": "",
+      "qty": 1,
+      "store": "Sanrio Gift Gate",
+      "note": "大約手掌大小，選表情最可愛的",
+      "img": "data/img/s5.svg"
+    },
+    {
+      "id": "s6",
+      "name": "無印良品 舒適手帳 A6",
+      "jpy": 890,
+      "twd": "",
+      "qty": 1,
+      "store": "無印良品",
+      "note": "",
+      "img": "data/img/s6.svg"
+    },
+    {
+      "id": "s7",
+      "name": "龍角散喉糖（袋裝）",
+      "jpy": 330,
+      "twd": "",
+      "qty": 5,
+      "store": "唐吉訶德",
+      "note": "便宜就多買幾包",
+      "img": "data/img/s7.svg"
+    }
+  ]
+}
