@@ -1,18 +1,8 @@
 {
   "title": "名古屋日本代購清單",
   "rate": 0.21,
-  "updatedAt": "2026-11-23T13:22:55.688Z",
+  "updatedAt": "2026-11-23T13:22:57.396Z",
   "items": [
-    {
-      "id": "s4",
-      "name": "DHC 護唇膏",
-      "jpy": 770,
-      "twd": "",
-      "qty": 4,
-      "store": "唐吉訶德",
-      "note": "",
-      "img": "data/img/s4.svg"
-    },
     {
       "id": "s5",
       "name": "Sanrio 酷洛米玩偶吊飾",
