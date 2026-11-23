@@ -10,7 +10,9 @@ function read(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); }
 function write(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]; }); }
 function num(n) { return Math.round(n).toLocaleString('en-US'); }
-function twdOf(it) { return (it.twd !== '' && it.twd != null) ? Number(it.twd) : Math.round(Number(it.jpy || 0) * Number(data.rate || 0)); }
+function twdOf(it) { return (it.twd !== '' && it.twd != null) ? Number(it.twd) : Math.round(Number(it.jpy || 0) * Rate.current(data).rate); }
+function storeInfo(name) { return (data.stores && data.stores[name]) || {}; }
+function mapLink(name) { var s = storeInfo(name); return s.map || (s.address ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(s.address) : ''); }
 function mark(id) { return marks[id] || {}; }
 function status(id) { return mark(id).status || ''; }
 function setMark(id, patch) { marks[id] = Object.assign({}, mark(id), patch); write(MARK_KEY, marks); render(); }
@@ -55,7 +57,7 @@ function render() {
   h += '<div class="top"><div><p class="eyebrow">JAPAN SHOPPING LIST</p><h1>' + esc(data.title) + '</h1></div><button class="iconbtn" data-act="menu" aria-label="選單">' + icon('menu') + '</button></div>';
   h += '<div class="summary"><div class="ring"><svg viewBox="0 0 84 84"><circle class="track" cx="42" cy="42" r="36"/><circle class="val" cx="42" cy="42" r="36" stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + off.toFixed(1) + '"/></svg><div><b>' + done.length + '</b><small>/ ' + items.length + ' 項</small></div></div>';
   h += '<div class="sumtext"><small>已經花了</small><span class="big">¥' + num(doneJ) + '</span><span class="sub">約 NT$' + num(doneT) + '<br>總預算 ¥' + num(totJ) + '・NT$' + num(totT) + '</span></div></div>';
-  if (data.updatedAt) h += '<p class="updated">清單更新於 ' + fmtTime(data.updatedAt) + '</p>';
+  h += '<p class="updated">' + Rate.label(data) + (data.updatedAt ? '<br>清單更新於 ' + fmtTime(data.updatedAt) : '') + '</p>';
   h += '</header><div class="wrap">';
   if (ui.offline) h += '<div class="offline">目前離線，顯示上次下載的清單，勾選照常記錄</div>';
   h += '<div class="filters"><div class="seg">';
@@ -77,7 +79,7 @@ function render() {
     h += '<div class="info"><div class="meta">';
     if (s === 'done') h += '<span class="badge">' + icon('check', 3) + '買到了</span>';
     if (s === 'oos') h += '<span class="badge oos">沒買到</span>';
-    if (it.store) h += '<span class="store">' + icon('pin') + esc(it.store) + '</span>';
+    if (it.store) { var si = storeInfo(it.store), has = si.map || si.address || si.hours; h += '<button class="store" data-act="storeinfo" data-v="' + esc(it.store) + '">' + icon('pin') + esc(it.store) + (has ? '<span class="more">' + icon('map') + '</span>' : '') + '</button>'; }
     h += '</div><p class="name">' + esc(it.name) + '</p>';
     h += '<div class="price"><b>¥' + num(it.jpy || 0) + '</b><span>NT$' + num(twdOf(it)) + '</span><span class="qty">× ' + esc(it.qty || 1) + '</span></div>';
     if (it.note) h += '<div class="note">' + esc(it.note) + '</div>';
@@ -127,6 +129,18 @@ function shareResult() {
     openSheet('<h2>購買結果<button data-act="close" aria-label="關閉">✕</button></h2><p class="hint">長按下方文字全選後複製</p><div class="field"><textarea style="min-height:260px" readonly>' + esc(text) + '</textarea></div>');
   }
 }
+function storeHtml(name) {
+  var s = storeInfo(name), link = mapLink(name), list = data.items.filter(function (i) { return i.store === name; });
+  var h = '<h2>' + icon('pin') + esc(name) + '<button data-act="close" aria-label="關閉">✕</button></h2><div class="storecard">';
+  if (s.hours) h += '<div class="srow">' + icon('clock') + '<div><small>營業時間</small>' + esc(s.hours) + '</div></div>';
+  if (s.address) h += '<div class="srow">' + icon('map') + '<div><small>地址</small>' + esc(s.address) + '</div></div>';
+  if (!s.hours && !s.address) h += '<p class="hint" style="margin:0">姊姊還沒填這個地點的地址和營業時間。</p>';
+  h += '</div>';
+  if (link) h += '<a class="primary maplink" href="' + esc(link) + '" target="_blank" rel="noopener">' + icon('nav') + '在 Google 地圖開啟</a>';
+  h += '<p class="hint" style="margin:18px 0 8px">在這裡要買的東西（' + list.filter(function (i) { return status(i.id) === 'done'; }).length + ' / ' + list.length + '）</p><div class="menu">';
+  list.forEach(function (i) { var st = status(i.id); h += '<div class="sitem' + (st ? ' ' + st : '') + '"><span>' + (st === 'done' ? icon('check', 3) : st === 'oos' ? icon('slash') : '') + '</span>' + esc(i.name) + '<em>× ' + esc(i.qty || 1) + '</em></div>'; });
+  return h + '</div>';
+}
 function menuHtml() {
   var standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
   return '<h2>選單<button data-act="close" aria-label="關閉">✕</button></h2><div class="menu">' +
@@ -158,6 +172,7 @@ $app.addEventListener('click', function (e) {
       break;
     case 'filter': ui.filter = b.dataset.v; render(); break;
     case 'store': ui.store = b.dataset.v; render(); break;
+    case 'storeinfo': openSheet(storeHtml(b.dataset.v)); break;
     case 'zoom': document.getElementById('lbimg').src = find(id).img; document.getElementById('lb').classList.add('show'); break;
     case 'close': closeSheet(); break;
     case 'menu': openSheet(menuHtml()); break;
@@ -205,9 +220,10 @@ function precacheImages() {
   });
 }
 
+function updateRate() { if (data) Rate.refresh(data).then(function (changed) { if (changed) render(); }); }
 render();
-sync(data ? false : 'first');
-document.addEventListener('visibilitychange', function () { if (!document.hidden) sync(false); });
-window.addEventListener('online', function () { sync(false); });
+sync(data ? false : 'first').then(updateRate);
+document.addEventListener('visibilitychange', function () { if (!document.hidden) sync(false).then(updateRate); });
+window.addEventListener('online', function () { sync(false).then(updateRate); });
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
 })();

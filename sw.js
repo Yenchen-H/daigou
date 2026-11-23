@@ -1,7 +1,7 @@
 // 離線快取：程式本體用「先給快取、背景更新」，商品圖片永久快取，清單資料一律走網路（app 自己會在離線時用上次的資料）
-var SHELL = 'daigou-shell-v2';
+var SHELL = 'daigou-shell-v3';
 var IMG = 'daigou-img';
-var FILES = ['./', 'index.html', 'app.css', 'app.js', 'icons.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
+var FILES = ['./', 'index.html', 'app.css', 'app.js', 'icons.js', 'rate.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(SHELL).then(function (c) { return c.addAll(FILES); }).then(function () { return self.skipWaiting(); }));

@@ -16,7 +16,8 @@ function guessRepo() {
   return {owner: m ? m[1] : '', repo: m && seg && !/\.html$/.test(seg) ? seg : '', branch: 'main', token: ''};
 }
 function appUrl() { return location.href.replace(/admin\.html.*$/, ''); }
-function twdOf(it) { return (it.twd !== '' && it.twd != null) ? Number(it.twd) : Math.round(Number(it.jpy || 0) * Number(data.rate || 0)); }
+function twdOf(it) { return (it.twd !== '' && it.twd != null) ? Number(it.twd) : Math.round(Number(it.jpy || 0) * Rate.current(data).rate); }
+function storeInfo(name) { return (data.stores && data.stores[name]) || {}; }
 function imgSrc(it) { return previews[it.img] || it.img; }
 function stores() { var o = []; data.items.forEach(function (it) { if (it.store && o.indexOf(it.store) < 0) o.push(it.store); }); return o; }
 function find(id) { for (var i = 0; i < data.items.length; i++) if (data.items[i].id === id) return data.items[i]; }
@@ -101,13 +102,13 @@ function render() {
   var h = '<header class="wrap"><div class="top"><div><p class="eyebrow">ADMIN・後台管理</p><h1>' + esc(data.title) + '</h1></div><button class="iconbtn" data-act="settings" aria-label="設定">' + icon('gear') + '</button></div>';
   h += '<div class="summary"><div class="stats"><div><small>商品數</small><b>' + items.length + ' 項</b><em>' + stores().length + ' 個購買地點</em></div><div><small>總預算</small><b>¥' + num(totJ) + '</b><em>NT$' + num(totT) + '</em></div></div></div>';
   h += '<div class="adminbar"><a href="' + esc(appUrl()) + '" target="_blank" rel="noopener">' + icon('eye') + '妹妹的畫面</a><button data-act="copylink">' + icon('link') + '分享 app 網址</button></div>';
-  h += '<p class="updated">匯率 1 日圓 ≈ ' + esc(data.rate) + ' 台幣・每次儲存會自動發布</p></header><div class="wrap"><div class="list" style="margin-top:16px">';
+  h += '<p class="updated">匯率 ' + Rate.label(data) + '<br>每次儲存會自動發布給妹妹</p></header><div class="wrap"><div class="list" style="margin-top:16px">';
   if (!items.length) h += '<div class="empty">還沒有商品，按下方「新增商品」開始</div>';
   items.forEach(function (it, idx) {
     h += '<div class="card" data-id="' + esc(it.id) + '" style="grid-template-columns:80px 1fr">';
     h += it.img ? '<button class="thumb" data-act="zoom" style="background-image:url(\'' + esc(imgSrc(it)) + '\')"></button>' : '<div class="noimg">' + icon('image', 1.6) + '</div>';
     h += '<div class="info">';
-    if (it.store) h += '<div class="meta"><span class="store">' + icon('pin') + esc(it.store) + '</span></div>';
+    if (it.store) { var si = storeInfo(it.store); h += '<div class="meta"><span class="store">' + icon('pin') + esc(it.store) + (si.map || si.address || si.hours ? '<span class="more">' + icon('map') + '</span>' : '') + '</span></div>'; }
     h += '<p class="name">' + esc(it.name) + '</p>';
     h += '<div class="price"><b>¥' + num(it.jpy || 0) + '</b><span>NT$' + num(twdOf(it)) + '</span><span class="qty">× ' + esc(it.qty || 1) + '</span></div>';
     if (it.note) h += '<div class="note">' + esc(it.note) + '</div>';
@@ -132,13 +133,23 @@ function formHtml(it) {
     '<div class="field"><label>台幣價格 NT$</label><input name="twd" type="number" inputmode="numeric" min="0" value="' + esc(it.twd) + '" placeholder="留空自動換算"></div></div>' +
     '<div class="row2"><div class="field"><label>購買數量</label><input name="qty" type="number" inputmode="numeric" min="1" value="' + esc(it.qty || 1) + '"></div>' +
     '<div class="field"><label>購買地點</label><input name="store" list="storelist" value="' + esc(it.store) + '" placeholder="例：唐吉訶德"><datalist id="storelist">' + stores().map(function (s) { return '<option value="' + esc(s) + '">'; }).join('') + '</datalist></div></div>' +
+    storeFields(it.store) +
     '<div class="field"><label>備註</label><textarea name="note" placeholder="例：要藍色款、找不到可以買替代品">' + esc(it.note) + '</textarea></div>' +
     '<button class="primary" type="submit">' + (isNew ? '加入並發布' : '儲存並發布') + '</button></form>';
 }
+function storeFields(name) {
+  var s = storeInfo(name);
+  return '<div class="fieldset" id="storebox"><p>' + icon('pin') + ' 地點資訊（選填，同一個地點的商品會共用）</p>' +
+    '<div class="field"><label>Google 地圖連結</label><input name="smap" type="url" inputmode="url" value="' + esc(s.map) + '" placeholder="在 Google 地圖按「分享」→ 複製連結"></div>' +
+    '<div class="field"><label>營業時間</label><input name="shours" value="' + esc(s.hours) + '" placeholder="例：10:00–21:00，週三公休"></div>' +
+    '<div class="field"><label>地址</label><input name="saddr" value="' + esc(s.address) + '" placeholder="例：名古屋市中區榮3-…"></div></div>';
+}
 function settingsHtml() {
+  var auto = Rate.auto(data);
   return '<h2>設定<button data-act="close" aria-label="關閉">✕</button></h2><form id="sf"><div class="field"><label>清單名稱</label><input name="title" value="' + esc(data.title) + '"></div>' +
-    '<div class="field"><label>匯率（1 日圓 = ? 台幣）</label><input name="rate" type="number" step="0.0001" inputmode="decimal" value="' + esc(data.rate) + '"></div>' +
-    '<p class="hint">台幣價格留空的商品，會用這個匯率自動換算。</p><button class="primary" type="submit">儲存並發布</button></form>' +
+    '<label class="toggle"><input type="checkbox" name="autoRate"' + (auto ? ' checked' : '') + '><div>每天自動更新匯率<small>目前 ' + esc(Rate.label(data)) + '</small></div></label>' +
+    '<div class="field"><label>固定匯率（關閉自動時，或還沒連網時使用）</label><input name="rate" type="number" step="0.0001" inputmode="decimal" value="' + esc(data.rate) + '"></div>' +
+    '<p class="hint">台幣價格留空的商品，會用匯率自動換算。</p><button class="primary" type="submit">儲存並發布</button></form>' +
     '<div class="menu" style="margin-top:14px"><button data-act="logout"><span>' + icon('logout') + '</span><div>登出後台<small>從這支手機移除 GitHub 金鑰</small></div></button></div>';
 }
 
@@ -195,6 +206,13 @@ $app.addEventListener('click', function (e) {
     case 'logout': cfg.token = ''; write(CFG_KEY, cfg); location.reload(); break;
   }
 });
+// 換地點時，帶出這個地點已存的地址、營業時間
+$app.addEventListener('input', function (e) {
+  if (e.target.name !== 'store') return;
+  var s = storeInfo(e.target.value.trim()), f = e.target.form;
+  if (!s.map && !s.hours && !s.address) return;
+  f.smap.value = s.map || ''; f.shours.value = s.hours || ''; f.saddr.value = s.address || '';
+});
 $app.addEventListener('change', function (e) {
   if (e.target.id === 'imgin' && e.target.files[0]) {
     compress(e.target.files[0], function (d) {
@@ -211,7 +229,7 @@ $app.addEventListener('submit', function (e) {
     start(); return;
   }
   if (f.id === 'sf') {
-    data.title = fd.get('title').trim() || '日本代購清單'; data.rate = Number(fd.get('rate')) || data.rate;
+    data.title = fd.get('title').trim() || '日本代購清單'; data.rate = Number(fd.get('rate')) || data.rate; data.autoRate = !!fd.get('autoRate');
     closeSheet(); render(); publish('更新設定'); return;
   }
   if (f.id === 'f') {
@@ -221,6 +239,11 @@ $app.addEventListener('submit', function (e) {
     var newimg = fd.get('newimg');
     (newimg ? uploadImage(newimg, id) : Promise.resolve(fields.img)).then(function (img) {
       fields.img = img;
+      var sinfo = {map: fd.get('smap').trim(), hours: fd.get('shours').trim(), address: fd.get('saddr').trim()};
+      if (fields.store) {
+        data.stores = data.stores || {};
+        if (sinfo.map || sinfo.hours || sinfo.address) data.stores[fields.store] = sinfo; else delete data.stores[fields.store];
+      }
       if (f.dataset.id) Object.assign(find(id), fields);
       else { fields.id = id; data.items.push(fields); }
       closeSheet(); render();
@@ -232,7 +255,7 @@ $app.addEventListener('submit', function (e) {
 function start() {
   if (!cfg.token || !cfg.owner || !cfg.repo) { loginView(); return; }
   $app.innerHTML = '<div class="wrap"><div class="empty">載入中⋯⋯</div></div>';
-  load().then(function () { write(CFG_KEY, cfg); render(); }).catch(function (e) {
+  load().then(function () { write(CFG_KEY, cfg); render(); Rate.refresh(data).then(function (c) { if (c) render(); }); }).catch(function (e) {
     loginView(e.status === 401 ? '金鑰無效，請重新貼上' : e.status === 404 || e.status === 403 ? '找不到專案或金鑰沒有權限，請確認帳號、專案名稱和金鑰權限' : '連線失敗：' + e.message);
   });
 }
