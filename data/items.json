@@ -1,7 +1,7 @@
 {
   "title": "名古屋日本代購清單",
   "rate": 0.21,
-  "updatedAt": "2026-11-23T13:34:19.945Z",
+  "updatedAt": "2026-11-23T14:04:37.675Z",
   "items": [
     {
       "name": "Nike Mind 001(黑色)  US8",
@@ -12,6 +12,16 @@
       "note": "US8或US7.5\n26cm",
       "img": "data/img/mwtb1bl1qgwt-mwtb4mi6.jpg",
       "id": "mwtb1bl1qgwt"
+    },
+    {
+      "name": "lelabo Another13 50ml",
+      "jpy": 32230,
+      "twd": "",
+      "qty": 1,
+      "store": "lelabo",
+      "note": "50ml 台灣賣NT.7600元",
+      "img": "data/img/mwtc7e0gurch-mwtc7e0g.jpg",
+      "id": "mwtc7e0gurch"
     }
   ],
   "stores": {
@@ -19,6 +29,11 @@
       "map": "https://www.google.com/maps/place/3-ch%C5%8Dme-15-27+Sakae,+Naka+Ward,+Nagoya,+Aichi+460-0008%E6%97%A5%E6%9C%AC/@35.1670029,136.8935199,18z/data=!4m6!3m5!1s0x600370d21d046cfd:0x69cdbf1e6de4bcd5!8m2!3d35.1659107!4d136.9075749!16s%2Fg%2F11g6z2_6zv?entry=ttu&g_ep=EgoyMDI2MTExOC4xIKXMDSoASAFQAw%3D%3D",
       "hours": "Sun - Sat: 11:00 AM - 9:00 PM",
       "address": "Chuo-Ku  3-15-27, Sakae  Nagoya-Shi, Aichi, 460-0008, JP  +8152 211 7992"
+    },
+    "lelabo": {
+      "map": "https://www.google.com/maps/search/%E6%84%9B%E7%9F%A5%E7%B8%A3%E5%90%8D%E5%8F%A4%E5%B1%8B%E5%B8%82%E4%B8%AD%E6%9D%91%E5%8D%80%E5%90%8D%E9%A9%9B+1-1-3+%E9%AB%98%E5%B3%B6%E5%B1%8B%E9%96%80%E5%A1%94%E8%B3%BC%E7%89%A9%E4%B8%AD%E5%BF%83+2F%EF%BC%88%E3%80%92450-6614+%E6%84%9B%E7%9F%A5%E7%9C%8C%E5%90%8D%E5%8F%A4%E5%B1%8B%E5%B8%82%E4%B8%AD%E6%9D%91%E5%8C%BA%E5%90%8D%E9%A7%851-1-3+%E3%82%BF%E3%82%AB%E3%82%B7%E3%83%9E%E3%83%A4+%E3%82%B2%E3%83%BC%E3%83%88%E3%82%BF%E3%83%AF%E3%83%BC%E3%83%A2%E3%83%BC%E3%83%AB2%E9%9A%8E%EF%BC%89/@24.5037556,121.2786478,8z?entry=ttu&g_ep=EgoyMDI2MTExOC4xIKXMDSoASAFQAw%3D%3D",
+      "hours": "10:00 – 20:00",
+      "address": "愛知縣名古屋市中村區名驛 1-1-3 高島屋門塔購物中心 2F（〒450-6614 愛知県名古屋市中村区名駅1-1-3 タカシマヤ ゲートタワーモール2階）"
     }
   }
 }
