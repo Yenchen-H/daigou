@@ -1,6 +1,17 @@
 {
   "title": "名古屋日本代購清單",
   "rate": 0.21,
-  "updatedAt": "2026-11-23T13:23:16.156Z",
-  "items": []
+  "updatedAt": "2026-11-23T13:31:41.415Z",
+  "items": [
+    {
+      "name": "Nike Mind 001(黑色)  US8",
+      "jpy": 13200,
+      "twd": "",
+      "qty": 1,
+      "store": "Nike Nagoya Sakae",
+      "note": "US8或US7.5\n26cm",
+      "img": "",
+      "id": "mwtb1bl1qgwt"
+    }
+  ]
 }
