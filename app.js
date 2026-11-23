@@ -50,23 +50,21 @@ function render() {
   });
   var oosN = items.filter(function (i) { return status(i.id) === 'oos'; }).length;
 
-  var h = '<header><div class="wrap">';
-  h += '<div class="top"><h1>' + esc(data.title) + '</h1><button class="iconbtn" data-act="menu">☰ 選單</button></div>';
-  h += '<div class="progress"><div class="bar"><i style="width:' + pct + '%"></i></div><b>已買 ' + done.length + ' / ' + items.length + '</b></div>';
-  h += '<div class="totals">';
-  h += '<div class="tot"><small>全部預算</small><span>¥' + num(totJ) + '</span><em>≈ NT$' + num(totT) + '</em></div>';
-  h += '<div class="tot"><small>已花費</small><span>¥' + num(doneJ) + '</span><em>≈ NT$' + num(doneT) + '</em></div>';
-  h += '</div>';
-  if (data.updatedAt) h += '<div class="updated">清單更新於 ' + fmtTime(data.updatedAt) + '</div>';
-  h += '</div></header><div class="wrap">';
-  if (ui.offline) h += '<div class="offline">📴 目前離線，顯示上次下載的清單。勾選照常會記錄。</div>';
+  var C = 2 * Math.PI * 36, off = C * (1 - pct / 100);
+  var h = '<header class="wrap">';
+  h += '<div class="top"><div><p class="eyebrow">JAPAN SHOPPING LIST</p><h1>' + esc(data.title) + '</h1></div><button class="iconbtn" data-act="menu" aria-label="選單">' + icon('menu') + '</button></div>';
+  h += '<div class="summary"><div class="ring"><svg viewBox="0 0 84 84"><circle class="track" cx="42" cy="42" r="36"/><circle class="val" cx="42" cy="42" r="36" stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + off.toFixed(1) + '"/></svg><div><b>' + done.length + '</b><small>/ ' + items.length + ' 項</small></div></div>';
+  h += '<div class="sumtext"><small>已經花了</small><span class="big">¥' + num(doneJ) + '</span><span class="sub">約 NT$' + num(doneT) + '<br>總預算 ¥' + num(totJ) + '・NT$' + num(totT) + '</span></div></div>';
+  if (data.updatedAt) h += '<p class="updated">清單更新於 ' + fmtTime(data.updatedAt) + '</p>';
+  h += '</header><div class="wrap">';
+  if (ui.offline) h += '<div class="offline">目前離線，顯示上次下載的清單，勾選照常記錄</div>';
   h += '<div class="filters"><div class="seg">';
-  [['all', '全部'], ['todo', '還沒買'], ['done', '已買到'], ['oos', '沒買到' + (oosN ? ' ' + oosN : '')]].forEach(function (f) {
+  [['all', '全部'], ['todo', '待買'], ['done', '買到了'], ['oos', '沒買到' + (oosN ? '<i>' + oosN + '</i>' : '')]].forEach(function (f) {
     h += '<button data-act="filter" data-v="' + f[0] + '" class="' + (ui.filter === f[0] ? 'on' : '') + '">' + f[1] + '</button>';
   });
   h += '</div>';
   if (st.length > 1) {
-    h += '<div class="chips"><button class="chip ' + (!ui.store ? 'on' : '') + '" data-act="store" data-v="">📍 全部地點</button>';
+    h += '<div class="chips"><button class="chip ' + (!ui.store ? 'on' : '') + '" data-act="store" data-v="">全部地點</button>';
     st.forEach(function (s) { h += '<button class="chip ' + (ui.store === s ? 'on' : '') + '" data-act="store" data-v="' + esc(s) + '">' + esc(s) + '</button>'; });
     h += '</div>';
   }
@@ -75,19 +73,19 @@ function render() {
   shown.forEach(function (it) {
     var s = status(it.id), m = mark(it.id);
     h += '<div class="card' + (s === 'done' ? ' done' : s === 'oos' ? ' oos' : '') + '" data-id="' + esc(it.id) + '">';
-    h += it.img ? '<button class="thumb" data-act="zoom" style="background-image:url(\'' + esc(it.img) + '\')" aria-label="放大圖片"></button>' : '<div class="noimg">無圖片</div>';
-    h += '<div class="info"><p class="name">' + esc(it.name) + '</p>';
-    if (it.store) h += '<span class="store">📍 ' + esc(it.store) + '</span>';
-    h += '<div class="price"><span class="jpy">¥' + num(it.jpy || 0) + '</span><span class="twd">≈ NT$' + num(twdOf(it)) + '</span><span class="qty">×' + esc(it.qty || 1) + '</span></div>';
+    h += it.img ? '<button class="thumb" data-act="zoom" style="background-image:url(\'' + esc(it.img) + '\')" aria-label="放大圖片"></button>' : '<div class="noimg">' + icon('image', 1.6) + '</div>';
+    h += '<div class="info"><div class="meta">';
+    if (s === 'done') h += '<span class="badge">' + icon('check', 3) + '買到了</span>';
+    if (s === 'oos') h += '<span class="badge oos">沒買到</span>';
+    if (it.store) h += '<span class="store">' + icon('pin') + esc(it.store) + '</span>';
+    h += '</div><p class="name">' + esc(it.name) + '</p>';
+    h += '<div class="price"><b>¥' + num(it.jpy || 0) + '</b><span>NT$' + num(twdOf(it)) + '</span><span class="qty">× ' + esc(it.qty || 1) + '</span></div>';
     if (it.note) h += '<div class="note">' + esc(it.note) + '</div>';
-    if (m.report) h += '<div class="report">💬 ' + esc(m.report) + '</div>';
-    h += '</div><div class="side">';
-    h += '<button class="check" data-act="toggle" aria-label="已買到"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>';
-    if (s === 'done') h += '<span class="status">買到了</span>';
-    else if (s === 'oos') h += '<span class="status">沒買到</span>';
-    h += '<button class="mini oosbtn" data-act="oos">' + (s === 'oos' ? '↺ 取消' : '缺貨/<br>沒買到') + '</button>';
-    h += '<button class="mini" data-act="report">💬 回報</button>';
-    h += '</div></div>';
+    if (m.report) h += '<div class="report">' + esc(m.report) + '</div>';
+    h += '<div class="actions"><button class="pill' + (s === 'oos' ? ' on' : '') + '" data-act="oos">' + (s === 'oos' ? icon('undo') + '取消缺貨' : icon('slash') + '缺貨') + '</button>';
+    h += '<button class="pill" data-act="report">' + icon('chat') + (m.report ? '改回報' : '回報') + '</button></div>';
+    h += '</div><button class="check" data-act="toggle" aria-label="買到了"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>';
+    h += '</div>';
   });
   h += '</div></div>' + overlays();
   $app.innerHTML = h;
@@ -126,16 +124,16 @@ function shareResult() {
     navigator.clipboard.writeText(text).then(function () { toast('已複製，可以貼到 LINE'); }, fallback);
   } else fallback();
   function fallback() {
-    openSheet('<h2>購買結果<button data-act="close">✕</button></h2><p class="hint">長按下方文字全選後複製</p><div class="field"><textarea style="min-height:260px" readonly>' + esc(text) + '</textarea></div>');
+    openSheet('<h2>購買結果<button data-act="close" aria-label="關閉">✕</button></h2><p class="hint">長按下方文字全選後複製</p><div class="field"><textarea style="min-height:260px" readonly>' + esc(text) + '</textarea></div>');
   }
 }
 function menuHtml() {
   var standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
-  return '<h2>選單<button data-act="close">✕</button></h2><div class="menu">' +
-    '<button data-act="share"><span>📋</span><div>回報購買結果<small>整理成文字，傳到 LINE 給姊姊</small></div></button>' +
-    '<button data-act="refresh"><span>🔄</span><div>重新抓取清單<small>有網路時取得最新內容</small></div></button>' +
-    (standalone ? '' : '<button data-act="install"><span>📲</span><div>加到主畫面<small>變成 app，沒網路也能開</small></div></button>') +
-    '<button data-act="resetchecks"><span>↺</span><div>清除所有勾選<small>商品保留，勾選與回報歸零</small></div></button>' +
+  return '<h2>選單<button data-act="close" aria-label="關閉">✕</button></h2><div class="menu">' +
+    '<button data-act="share"><span>' + icon('share') + '</span><div>回報購買結果<small>整理成文字，傳到 LINE 給姊姊</small></div></button>' +
+    '<button data-act="refresh"><span>' + icon('refresh') + '</span><div>重新抓取清單<small>有網路時取得最新內容</small></div></button>' +
+    (standalone ? '' : '<button data-act="install"><span>' + icon('phone') + '</span><div>加到主畫面<small>變成 app，沒網路也能開</small></div></button>') +
+    '<button data-act="resetchecks"><span>' + icon('reset') + '</span><div>清除所有勾選<small>商品保留，勾選與回報歸零</small></div></button>' +
     '</div>';
 }
 var installEvt = null;
@@ -143,9 +141,9 @@ window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault()
 function installHelp() {
   if (installEvt) { installEvt.prompt(); installEvt = null; closeSheet(); return; }
   var ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  openSheet('<h2>加到主畫面<button data-act="close">✕</button></h2>' + (ios
-    ? '<ol style="padding-left:20px;line-height:1.9"><li>用 <b>Safari</b> 開這個網址（LINE 裡請點右下「⋯」→「用 Safari 開啟」）</li><li>按下方的分享按鈕 <b>⬆︎</b></li><li>往下找「<b>加入主畫面</b>」→ 新增</li><li>之後從主畫面的「代購清單」圖示打開</li></ol>'
-    : '<ol style="padding-left:20px;line-height:1.9"><li>用 <b>Chrome</b> 開這個網址</li><li>按右上角 <b>⋮</b></li><li>選「<b>加到主畫面</b>」或「安裝應用程式」</li><li>之後從主畫面的「代購清單」圖示打開</li></ol>') +
+  openSheet('<h2>加到主畫面<button data-act="close" aria-label="關閉">✕</button></h2>' + (ios
+    ? '<ol class="steps"><li>用 <b>Safari</b> 開這個網址（LINE 裡請點右下「⋯」→「用 Safari 開啟」）</li><li>按下方的分享按鈕 <b>⬆︎</b></li><li>往下找「<b>加入主畫面</b>」→ 新增</li><li>之後從主畫面的「代購清單」圖示打開</li></ol>'
+    : '<ol class="steps"><li>用 <b>Chrome</b> 開這個網址</li><li>按右上角 <b>⋮</b></li><li>選「<b>加到主畫面</b>」或「安裝應用程式」</li><li>之後從主畫面的「代購清單」圖示打開</li></ol>') +
     '<p class="hint">加好後先開一次讓它下載清單，之後在日本沒網路也能看、能勾選。</p>');
 }
 
@@ -156,7 +154,7 @@ $app.addEventListener('click', function (e) {
     case 'toggle': setMark(id, {status: status(id) === 'done' ? '' : 'done'}); break;
     case 'oos': setMark(id, {status: status(id) === 'oos' ? '' : 'oos'}); break;
     case 'report':
-      openSheet('<h2>回報：' + esc(find(id).name) + '<button data-act="close">✕</button></h2><p class="hint">例如實際價格、買了幾個、換成別款⋯⋯</p><form id="rf" data-id="' + esc(id) + '"><div class="field"><textarea name="report" placeholder="寫點什麼給姊姊">' + esc(mark(id).report || '') + '</textarea></div><button class="primary" type="submit">儲存回報</button></form>');
+      openSheet('<h2>回報：' + esc(find(id).name) + '<button data-act="close" aria-label="關閉">✕</button></h2><p class="hint">例如實際價格、買了幾個、換成別款⋯⋯</p><form id="rf" data-id="' + esc(id) + '"><div class="field"><textarea name="report" placeholder="寫點什麼給姊姊">' + esc(mark(id).report || '') + '</textarea></div><button class="primary" type="submit">儲存回報</button></form>');
       break;
     case 'filter': ui.filter = b.dataset.v; render(); break;
     case 'store': ui.store = b.dataset.v; render(); break;

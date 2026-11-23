@@ -83,12 +83,12 @@ function setBusy(d) {
 
 // ---- 畫面 ----
 function loginView(err) {
-  $app.innerHTML = '<header><div class="wrap"><div class="top"><h1>代購清單・後台</h1></div></div></header><div class="wrap"><div class="login">' +
-    '<p style="margin:0 0 8px"><b>第一次使用請設定 GitHub 金鑰</b>（只需一次，存在這支手機上）</p>' +
+  $app.innerHTML = '<header class="wrap"><div class="top"><div><p class="eyebrow">ADMIN</p><h1>代購清單後台</h1></div></div></header><div class="wrap"><div class="login">' +
+    '<h3>第一次使用，請設定 GitHub 金鑰</h3><p class="hint" style="margin:0">只需要做一次，金鑰只存在這支手機上。</p>' +
     '<ol><li>打開 <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">建立 GitHub 金鑰</a></li>' +
     '<li>Token name 隨便填，Expiration 選 90 天以上</li><li>Repository access 選「Only select repositories」，選 <b>' + esc(cfg.repo || 'daigou') + '</b></li>' +
     '<li>Permissions → Repository permissions → <b>Contents</b> 改成「Read and write」</li><li>按 Generate token，複製貼到下面</li></ol>' +
-    (err ? '<p style="color:var(--red);font-size:14px">' + esc(err) + '</p>' : '') +
+    (err ? '<p class="err">' + esc(err) + '</p>' : '') +
     '<form id="login"><div class="field"><label>GitHub 金鑰</label><input name="token" type="password" autocomplete="off" required placeholder="github_pat_..." value="' + esc(cfg.token) + '"></div>' +
     '<div class="row2"><div class="field"><label>GitHub 帳號</label><input name="owner" required value="' + esc(cfg.owner) + '"></div>' +
     '<div class="field"><label>專案名稱</label><input name="repo" required value="' + esc(cfg.repo || 'daigou') + '"></div></div>' +
@@ -98,21 +98,22 @@ function loginView(err) {
 function render() {
   var items = data.items, st = stores(), totJ = 0, totT = 0;
   items.forEach(function (i) { var q = Number(i.qty || 1); totJ += Number(i.jpy || 0) * q; totT += twdOf(i) * q; });
-  var h = '<header><div class="wrap"><div class="top"><h1>' + esc(data.title) + '<br><small style="font-size:13px;font-weight:400;opacity:.85">後台管理・' + items.length + ' 項商品</small></h1><button class="iconbtn" data-act="settings">⚙️ 設定</button></div>';
-  h += '<div class="totals"><div class="tot"><small>全部預算</small><span>¥' + num(totJ) + '</span><em>≈ NT$' + num(totT) + '</em></div><div class="tot"><small>匯率</small><span>' + esc(data.rate) + '</span><em>1 日圓換台幣</em></div></div>';
-  h += '<div class="adminbar"><a href="' + esc(appUrl()) + '" target="_blank" rel="noopener">👀 看妹妹的畫面</a><button data-act="copylink">🔗 複製 app 網址</button></div>';
-  h += '</div></header><div class="wrap"><div class="list" style="margin-top:14px">';
-  if (!items.length) h += '<div class="empty">還沒有商品，點下方「＋ 新增商品」開始</div>';
+  var h = '<header class="wrap"><div class="top"><div><p class="eyebrow">ADMIN・後台管理</p><h1>' + esc(data.title) + '</h1></div><button class="iconbtn" data-act="settings" aria-label="設定">' + icon('gear') + '</button></div>';
+  h += '<div class="summary"><div class="stats"><div><small>商品數</small><b>' + items.length + ' 項</b><em>' + stores().length + ' 個購買地點</em></div><div><small>總預算</small><b>¥' + num(totJ) + '</b><em>NT$' + num(totT) + '</em></div></div></div>';
+  h += '<div class="adminbar"><a href="' + esc(appUrl()) + '" target="_blank" rel="noopener">' + icon('eye') + '妹妹的畫面</a><button data-act="copylink">' + icon('link') + '分享 app 網址</button></div>';
+  h += '<p class="updated">匯率 1 日圓 ≈ ' + esc(data.rate) + ' 台幣・每次儲存會自動發布</p></header><div class="wrap"><div class="list" style="margin-top:16px">';
+  if (!items.length) h += '<div class="empty">還沒有商品，按下方「新增商品」開始</div>';
   items.forEach(function (it, idx) {
-    h += '<div class="card" data-id="' + esc(it.id) + '" style="grid-template-columns:84px 1fr">';
-    h += it.img ? '<button class="thumb" data-act="zoom" style="background-image:url(\'' + esc(imgSrc(it)) + '\')"></button>' : '<div class="noimg">無圖片</div>';
-    h += '<div class="info"><p class="name">' + esc(it.name) + '</p>';
-    if (it.store) h += '<span class="store">📍 ' + esc(it.store) + '</span>';
-    h += '<div class="price"><span class="jpy">¥' + num(it.jpy || 0) + '</span><span class="twd">≈ NT$' + num(twdOf(it)) + '</span><span class="qty">×' + esc(it.qty || 1) + '</span></div>';
+    h += '<div class="card" data-id="' + esc(it.id) + '" style="grid-template-columns:80px 1fr">';
+    h += it.img ? '<button class="thumb" data-act="zoom" style="background-image:url(\'' + esc(imgSrc(it)) + '\')"></button>' : '<div class="noimg">' + icon('image', 1.6) + '</div>';
+    h += '<div class="info">';
+    if (it.store) h += '<div class="meta"><span class="store">' + icon('pin') + esc(it.store) + '</span></div>';
+    h += '<p class="name">' + esc(it.name) + '</p>';
+    h += '<div class="price"><b>¥' + num(it.jpy || 0) + '</b><span>NT$' + num(twdOf(it)) + '</span><span class="qty">× ' + esc(it.qty || 1) + '</span></div>';
     if (it.note) h += '<div class="note">' + esc(it.note) + '</div>';
-    h += '</div><div class="edit-row"><button data-act="edit">✏️ 修改</button><button data-act="up"' + (idx ? '' : ' disabled style="opacity:.4"') + '>↑ 上移</button><button class="del" data-act="del">🗑 刪除</button></div></div>';
+    h += '</div><div class="edit-row"><button data-act="edit">' + icon('edit') + '修改</button><button data-act="up"' + (idx ? '' : ' disabled') + '>' + icon('up') + '上移</button><button class="del" data-act="del">' + icon('trash') + '刪除</button></div></div>';
   });
-  h += '</div></div><button class="fab" data-act="add">＋ 新增商品</button>';
+  h += '</div></div><button class="fab" data-act="add">' + icon('plus', 2.6) + '新增商品</button>';
   h += '<div class="mask" id="mask" data-act="close"></div><div class="sheet" id="sheet"><div class="inner" id="sheetIn"></div></div>';
   h += '<div class="lightbox" id="lb" data-act="close"><img id="lbimg" alt=""></div><div class="toast" id="toast"></div><div class="saving" id="saving">儲存中⋯⋯</div>';
   $app.innerHTML = h;
@@ -121,10 +122,10 @@ function render() {
 function formHtml(it) {
   var isNew = !it;
   it = it || {name: '', jpy: '', twd: '', qty: 1, store: '', note: '', img: ''};
-  return '<h2>' + (isNew ? '新增商品' : '修改商品') + '<button data-act="close">✕</button></h2>' +
+  return '<h2>' + (isNew ? '新增商品' : '修改商品') + '<button data-act="close" aria-label="關閉">✕</button></h2>' +
     '<form id="f" data-id="' + (isNew ? '' : esc(it.id)) + '">' +
     '<div class="field"><label>商品圖片</label><div class="imgpick"><div class="prevbox" id="prev" style="background-image:url(\'' + esc(it.img ? imgSrc(it) : '') + '\')">' + (it.img ? '' : '尚無圖片') + '</div>' +
-    '<div><label class="btn">📷 拍照／選圖片<input type="file" accept="image/*" id="imgin" hidden></label> ' + (it.img ? '<button type="button" class="chip" data-act="rmimg">移除</button>' : '') + '<div class="hint" style="margin:6px 0 0">會自動壓縮</div></div></div>' +
+    '<div><label class="btn">' + icon('camera') + '拍照／選圖片<input type="file" accept="image/*" id="imgin" hidden></label> ' + (it.img ? '<button type="button" class="chip" data-act="rmimg">移除</button>' : '') + '<div class="hint" style="margin:6px 0 0">會自動壓縮</div></div></div>' +
     '<input type="hidden" name="newimg" value=""><input type="hidden" name="img" value="' + esc(it.img) + '"></div>' +
     '<div class="field"><label>商品名稱 *</label><input name="name" required value="' + esc(it.name) + '" placeholder="例：合利他命 EX Plus 270錠"></div>' +
     '<div class="row2"><div class="field"><label>日幣價格 ¥</label><input name="jpy" type="number" inputmode="numeric" min="0" value="' + esc(it.jpy) + '"></div>' +
@@ -135,10 +136,10 @@ function formHtml(it) {
     '<button class="primary" type="submit">' + (isNew ? '加入並發布' : '儲存並發布') + '</button></form>';
 }
 function settingsHtml() {
-  return '<h2>設定<button data-act="close">✕</button></h2><form id="sf"><div class="field"><label>清單名稱</label><input name="title" value="' + esc(data.title) + '"></div>' +
+  return '<h2>設定<button data-act="close" aria-label="關閉">✕</button></h2><form id="sf"><div class="field"><label>清單名稱</label><input name="title" value="' + esc(data.title) + '"></div>' +
     '<div class="field"><label>匯率（1 日圓 = ? 台幣）</label><input name="rate" type="number" step="0.0001" inputmode="decimal" value="' + esc(data.rate) + '"></div>' +
     '<p class="hint">台幣價格留空的商品，會用這個匯率自動換算。</p><button class="primary" type="submit">儲存並發布</button></form>' +
-    '<div class="menu" style="margin-top:14px"><button data-act="logout"><span>🚪</span><div>登出後台<small>從這支手機移除 GitHub 金鑰</small></div></button></div>';
+    '<div class="menu" style="margin-top:14px"><button data-act="logout"><span>' + icon('logout') + '</span><div>登出後台<small>從這支手機移除 GitHub 金鑰</small></div></button></div>';
 }
 
 function openSheet(html) { document.getElementById('sheetIn').innerHTML = html; document.getElementById('mask').classList.add('show'); document.getElementById('sheet').classList.add('show'); }
@@ -179,7 +180,7 @@ $app.addEventListener('click', function (e) {
       break;
     case 'del':
       if (b.dataset.sure) { data.items.splice(data.items.indexOf(it), 1); render(); publish('刪除：' + it.name).then(function () { removeFile(it.img); }); }
-      else { b.dataset.sure = '1'; b.textContent = '再按一次確認'; }
+      else { b.dataset.sure = '1'; b.textContent = '再按一次刪除'; }
       break;
     case 'rmimg':
       document.querySelector('#f [name=img]').value = ''; document.querySelector('#f [name=newimg]').value = '';
