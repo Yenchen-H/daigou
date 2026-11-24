@@ -1,7 +1,7 @@
 {
   "title": "名古屋日本代購清單",
   "rate": 0.21,
-  "updatedAt": "2026-11-24T02:47:55.240Z",
+  "updatedAt": "2026-11-24T02:49:19.578Z",
   "items": [
     {
       "name": "Nike Mind 001(黑色)  US8",
@@ -39,8 +39,8 @@
       "twd": "",
       "qty": 1,
       "store": "唐吉軻德",
-      "note": "",
-      "img": "data/img/mwu3h8ilx6vo-mwu3h8il.jpg",
+      "note": "台灣約460元",
+      "img": "data/img/mwu3h8ilx6vo-mwu3j1mh.jpg",
       "id": "mwu3h8ilx6vo"
     }
   ],
@@ -59,6 +59,11 @@
       "map": "https://www.google.com/maps/place/Aesop+Nagoya+Sakae/data=!4m2!3m1!1s0x600371cbf30f508f:0x20f758732d476e08?sa=X&ved=1t:242&ictx=111",
       "hours": "10:00 am – 9:00 pm",
       "address": "Maruei Galleria 1F, 3-3-1 Sakae Naka-ku Nagoya-shi, Aichi 460-0008 Nagoya, 460-0008"
+    },
+    "唐吉軻德": {
+      "map": "https://www.google.com/maps/place/%E5%94%90%E5%90%89%E8%A8%B6%E5%BE%B7+UNY+%E7%B4%8D%E5%B1%8B%E6%A9%8B%E5%BA%97/@35.1666221,136.8929473,17z/data=!3m1!4b1!4m6!3m5!1s0x60037727fb51c779:0x7ad6d58127d3d767!8m2!3d35.1666221!4d136.8929473!16s%2Fg%2F11fz2m1kc4?hl=zh-Hant&entry=ttu&g_ep=EgoyMDI2MTExOC4xIKXMDSoASAFQAw%3D%3D",
+      "hours": "10:00–00:00",
+      "address": "1 Chome-2-番49号 Sakae, Naka Ward, Nagoya, Aichi 460-0008日本"
     }
   }
 }
