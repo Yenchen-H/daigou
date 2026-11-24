@@ -21,6 +21,21 @@ function fmtTime(iso) {
   var d = new Date(iso);
   return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
 }
+// 在 GitHub Pages 上時，直接向 GitHub 讀最新清單與圖片，不用等網站重新部署（約 1～5 分鐘）
+var REPO = (function () {
+  var m = location.hostname.match(/^([^.]+)\.github\.io$/i), seg = location.pathname.split('/').filter(Boolean)[0];
+  return m && seg && !/\./.test(seg) ? m[1] + '/' + seg : null;
+})();
+function imgUrl(p) { return REPO && p && p.indexOf('data/img/') === 0 ? 'https://raw.githubusercontent.com/' + REPO + '/main/' + p : p; }
+function fetchData() {
+  var pages = function () {
+    return fetch('data/items.json?t=' + Date.now(), {cache: 'no-store'}).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); });
+  };
+  if (!REPO) return pages();
+  return fetch('https://api.github.com/repos/' + REPO + '/contents/data/items.json?ref=main', {cache: 'no-store', headers: {'Accept': 'application/vnd.github.raw+json'}})
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .catch(pages);
+}
 function stores() { var o = []; data.items.forEach(function (it) { if (it.store && o.indexOf(it.store) < 0) o.push(it.store); }); return o; }
 
 var $app = document.getElementById('app');
@@ -75,7 +90,7 @@ function render() {
   shown.forEach(function (it) {
     var s = status(it.id), m = mark(it.id);
     h += '<div class="card' + (s === 'done' ? ' done' : s === 'oos' ? ' oos' : '') + '" data-id="' + esc(it.id) + '">';
-    h += it.img ? '<button class="thumb" data-act="zoom" style="background-image:url(\'' + esc(it.img) + '\')" aria-label="放大圖片"></button>' : '<div class="noimg">' + icon('image', 1.6) + '</div>';
+    h += it.img ? '<button class="thumb" data-act="zoom" style="background-image:url(\'' + esc(imgUrl(it.img)) + '\')" aria-label="放大圖片"></button>' : '<div class="noimg">' + icon('image', 1.6) + '</div>';
     h += '<div class="info"><div class="meta">';
     if (s === 'done') h += '<span class="badge">' + icon('check', 3) + '買到了</span>';
     if (s === 'oos') h += '<span class="badge oos">沒買到</span>';
@@ -173,7 +188,7 @@ $app.addEventListener('click', function (e) {
     case 'filter': ui.filter = b.dataset.v; render(); break;
     case 'store': ui.store = b.dataset.v; render(); break;
     case 'storeinfo': openSheet(storeHtml(b.dataset.v)); break;
-    case 'zoom': document.getElementById('lbimg').src = find(id).img; document.getElementById('lb').classList.add('show'); break;
+    case 'zoom': document.getElementById('lbimg').src = imgUrl(find(id).img); document.getElementById('lb').classList.add('show'); break;
     case 'close': closeSheet(); break;
     case 'menu': openSheet(menuHtml()); break;
     case 'share': closeSheet(); shareResult(); break;
@@ -192,11 +207,12 @@ $app.addEventListener('submit', function (e) {
 });
 
 // 下載最新清單；失敗就用上次存的
+var lastSync = 0;
 function sync(manual) {
-  return fetch('data/items.json?t=' + Date.now(), {cache: 'no-store'}).then(function (r) {
-    if (!r.ok) throw new Error(r.status);
-    return r.json();
-  }).then(function (d) {
+  lastSync = Date.now();
+  return fetchData().then(function (d) {
+    // 備援來源可能比較舊，不要用舊清單蓋掉新的
+    if (data && d.updatedAt && data.updatedAt && d.updatedAt < data.updatedAt) d = data;
     var changed = !data || d.updatedAt !== data.updatedAt;
     data = d; ui.offline = false; ui.loading = false;
     write(DATA_KEY, data);
@@ -215,7 +231,8 @@ function precacheImages() {
   caches.open('daigou-img').then(function (c) {
     data.items.forEach(function (it) {
       if (!it.img) return;
-      c.match(it.img).then(function (hit) { if (!hit) c.add(it.img).catch(function () {}); });
+      var u = imgUrl(it.img);
+      c.match(u).then(function (hit) { if (!hit) c.add(u).catch(function () {}); });
     });
   });
 }
@@ -223,7 +240,8 @@ function precacheImages() {
 function updateRate() { if (data) Rate.refresh(data).then(function (changed) { if (changed) render(); }); }
 render();
 sync(data ? false : 'first').then(updateRate);
-document.addEventListener('visibilitychange', function () { if (!document.hidden) sync(false).then(updateRate); });
+// 回到 app 時更新（30 秒內不重複抓，避免太頻繁）
+document.addEventListener('visibilitychange', function () { if (!document.hidden && Date.now() - lastSync > 30000) sync(false).then(updateRate); });
 window.addEventListener('online', function () { sync(false).then(updateRate); });
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
 })();

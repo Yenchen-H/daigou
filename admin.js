@@ -1,6 +1,6 @@
 (function () {
 'use strict';
-// 後台：讀寫 GitHub 上的 data/items.json 與 data/img/，存檔後 GitHub Pages 約 1 分鐘更新到妹妹的 app
+// 後台：讀寫 GitHub 上的 data/items.json 與 data/img/，存檔後妹妹的 app 下次開啟或回到畫面時就會抓到
 var CFG_KEY = 'daigou-admin';
 var cfg = read(CFG_KEY) || guessRepo();
 var data = null, sha = null, busy = 0, previews = {};
@@ -18,7 +18,10 @@ function guessRepo() {
 function appUrl() { return location.href.replace(/admin\.html.*$/, ''); }
 function twdOf(it) { return (it.twd !== '' && it.twd != null) ? Number(it.twd) : Math.round(Number(it.jpy || 0) * Rate.current(data).rate); }
 function storeInfo(name) { return (data.stores && data.stores[name]) || {}; }
-function imgSrc(it) { return previews[it.img] || it.img; }
+function imgSrc(it) {
+  if (previews[it.img]) return previews[it.img];
+  return it.img && it.img.indexOf('data/img/') === 0 && cfg.owner ? 'https://raw.githubusercontent.com/' + cfg.owner + '/' + cfg.repo + '/' + cfg.branch + '/' + it.img : it.img;
+}
 function stores() { var o = []; data.items.forEach(function (it) { if (it.store && o.indexOf(it.store) < 0) o.push(it.store); }); return o; }
 function find(id) { for (var i = 0; i < data.items.length; i++) if (data.items[i].id === id) return data.items[i]; }
 
@@ -54,7 +57,7 @@ function publish(msg) {
   queue = queue.then(function () {
     return api('data/items.json', {method: 'PUT', body: {message: msg, content: b64(body), sha: sha || undefined, branch: cfg.branch}});
   }).then(function (r) {
-    sha = r.content.sha; setBusy(-1); toast('已發布，約 1 分鐘後妹妹的 app 會更新');
+    sha = r.content.sha; setBusy(-1); toast('已發布，妹妹打開 app 就會看到');
   }, function (e) {
     setBusy(-1); fail(e);
     return load().then(render);
