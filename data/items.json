@@ -1,7 +1,7 @@
 {
   "title": "名古屋日本代購清單",
   "rate": 0.21,
-  "updatedAt": "2026-11-23T14:08:30.579Z",
+  "updatedAt": "2026-11-24T02:47:55.240Z",
   "items": [
     {
       "name": "Nike Mind 001(黑色)  US8",
@@ -32,6 +32,16 @@
       "note": "50ml，台灣賣4900元",
       "img": "data/img/mwtcck9qaqld-mwtcck9q.jpg",
       "id": "mwtcck9qaqld"
+    },
+    {
+      "name": "HORINISHI 堀西白松露萬能調味粉",
+      "jpy": 1900,
+      "twd": "",
+      "qty": 1,
+      "store": "唐吉軻德",
+      "note": "",
+      "img": "data/img/mwu3h8ilx6vo-mwu3h8il.jpg",
+      "id": "mwu3h8ilx6vo"
     }
   ],
   "stores": {
